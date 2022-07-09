@@ -44,8 +44,74 @@ exports.createMonthlyCheckboxes = async function() {
   }
 }
 
-//not used due to Notion unable to set the sequence for database properties
+//not used due to unable to add properties in sequence using Notion API
 exports.createWeeklyReview = async function() {
+  const today = new Date();
+  const nextWeekDate = new Date(today.getFullYear(), today.getMonth(), today.getDate()+7);
+  const notionDate = calendar.getNotionDate(nextWeekDate);
+  const monthAndWeek = calendar.getMonthAndWeek(nextWeekDate);
+  
+  try {
+    
+    const response = await notion.pages.create({
+    parent: {
+      database_id: kashEliteDatabaseId,
+    },
+    icon: {
+      type: "emoji",
+      emoji: "✍🏻"
+    },
+    properties: {
+      Name: {
+        title: [
+          {
+            text: {
+              content: `${monthAndWeek} Trade Review`,
+            },
+          },
+        ],
+      },
+      "Date": {
+        "date": {
+          "start": notionDate,
+        }
+      },
+    },
+    "children": [
+      {
+        "object": "block",
+        "heading_3": {
+          "rich_text": [
+            {
+              "text": {
+                  "content": "Key Takeaways:"
+              }
+            }
+          ]        
+        }
+      },
+      {
+        "object": "block",
+        "type": "numbered_list_item",
+        "numbered_list_item": {
+           "rich_text": [{
+            "type": "text",
+            "text": {
+              "content": "",
+            }
+          }],         
+        }
+      }
+    ]
+   
+  });
+    const pageId = response.id;
+    
+    //append children database
+    await createChildDatabase(pageId, `${monthAndWeek} Trade Summary`);
+  } catch(err) {
+    console.log(err);
+  }
 
 }
 
@@ -141,4 +207,3 @@ async function createChildDatabase(pageId, databaseTitle){
 
   
 }
-
