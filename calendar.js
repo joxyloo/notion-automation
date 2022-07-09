@@ -16,6 +16,6 @@ exports.getMonthAndWeek = function(fullDate) {
 }
 
 exports.getNotionDate = function(date) {
-
+  //
   return new Date(`${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}`).toISOString().split('T')[0];
 }
